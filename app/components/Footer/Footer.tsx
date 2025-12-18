@@ -10,7 +10,7 @@ export default function Footer() {
         >
           Copyright &copy; {new Date().getFullYear()} - Fest Management Website
           <br />
-          GNU Affero General Public License v3 (GNU AGPL v3)
+          GNU General Public License v3 (GNU GPL v3)
         </Link>
       </aside>
     </footer>
