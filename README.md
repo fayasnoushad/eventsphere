@@ -63,3 +63,16 @@ Contributions are welcome! Please fork the repository and create a pull request 
 This project is licensed under GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
 
 ---
+
+## Screenshots
+
+<div align="center">
+    <img src="./screenshots/1.png" alt="Screenshot 1" width="45%"/>
+    <img src="./screenshots/2.png" alt="Screenshot 2" width="45%"/>
+    <img src="./screenshots/3.png" alt="Screenshot 3" width="45%"/>
+    <img src="./screenshots/4.png" alt="Screenshot 4" width="45%"/>
+</div>
+
+Note: The e-certificate shown in this post is a sample, shared with permission from the respective participant.
+
+---
