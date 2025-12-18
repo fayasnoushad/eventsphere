@@ -72,6 +72,12 @@ export default function Header() {
                 Admin
               </Link>
             )}
+            <Link
+              className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
+              href="https://github.com/fayasnoushad/fest-management-website/"
+            >
+              Source Code
+            </Link>
           </ul>
         </div>
       </div>
