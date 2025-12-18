@@ -73,6 +73,6 @@ This project is licensed under GNU General Public License v3.0. See the [LICENSE
     <img src="./screenshots/4.png" alt="Screenshot 4" width="45%"/>
 </div>
 
-Note: The e-certificate shown in this post is a sample, shared with permission from the respective participant.
+> Note: The e-certificate shown in this post is a sample, shared with permission from the respective participant.
 
 ---
