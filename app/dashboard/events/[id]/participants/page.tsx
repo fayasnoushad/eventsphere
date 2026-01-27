@@ -49,13 +49,13 @@ export default function EventParticipantsPage() {
     }
   };
 
-  const handleCheckIn = async (participantId: string) => {
+  const handleCheckIn = async (ticketId: string) => {
     try {
       const response = await fetch("/api/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          participantId,
+          ticketId,
           eventId: params.id,
         }),
       });
@@ -73,13 +73,13 @@ export default function EventParticipantsPage() {
     }
   };
 
-  const handleApprove = async (participantId: string) => {
+  const handleApprove = async (ticketId: string) => {
     try {
       const response = await fetch("/api/approve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          participantId,
+          ticketId,
           eventId: params.id,
           action: "approve",
         }),
@@ -111,7 +111,7 @@ export default function EventParticipantsPage() {
         p.name.toLowerCase().includes(term) ||
         p.email.toLowerCase().includes(term) ||
         p.phone.includes(term) ||
-        p.participantId.toLowerCase().includes(term) ||
+        p.ticketId.toLowerCase().includes(term) ||
         p.college.toLowerCase().includes(term)
       );
     }
@@ -236,9 +236,7 @@ export default function EventParticipantsPage() {
             <tbody>
               {filteredParticipants.map((participant) => (
                 <tr key={participant._id?.toString()}>
-                  <td className="font-mono text-xs">
-                    {participant.participantId}
-                  </td>
+                  <td className="font-mono text-xs">{participant.ticketId}</td>
                   <td>
                     <div className="font-semibold">{participant.name}</div>
                     <div className="text-xs opacity-70">
@@ -272,9 +270,7 @@ export default function EventParticipantsPage() {
                     <div className="flex gap-2">
                       {participant.status === "pending" && (
                         <button
-                          onClick={() =>
-                            handleApprove(participant.participantId)
-                          }
+                          onClick={() => handleApprove(participant.ticketId)}
                           className="btn btn-xs btn-success"
                         >
                           Approve
@@ -282,9 +278,7 @@ export default function EventParticipantsPage() {
                       )}
                       {participant.status === "approved" && (
                         <button
-                          onClick={() =>
-                            handleCheckIn(participant.participantId)
-                          }
+                          onClick={() => handleCheckIn(participant.ticketId)}
                           className="btn btn-xs btn-primary"
                         >
                           Check In

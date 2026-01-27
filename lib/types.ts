@@ -103,7 +103,7 @@ export interface EventData {
 export interface Participant {
   _id?: ObjectId;
   eventId: string;
-  participantId: string; // Generated unique ID (e.g., "TF-ABC123")
+  ticketId: string; // Generated unique ID (e.g., "TF-ABC123")
 
   // Personal info
   name: string;
@@ -139,7 +139,7 @@ export interface Participant {
 export interface CheckIn {
   _id?: ObjectId;
   eventId: string;
-  participantId: string;
+  ticketId: string;
   checkedInBy: string; // Admin/organizer who checked them in
   checkedInAt: Date;
   notes?: string;

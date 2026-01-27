@@ -8,9 +8,9 @@ import { ObjectId } from "mongodb";
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
-    const { participantId, eventId, action } = await req.json();
+    const { ticketId, eventId, action } = await req.json();
 
-    if (!participantId || !eventId || !action) {
+    if (!ticketId || !eventId || !action) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: "Missing required fields" },
         { status: 400 },
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     // Update participant status
     const participants = await db.participants();
     const result = await participants.updateOne(
-      { eventId, participantId },
+      { eventId, ticketId },
       {
         $set: {
           status: action === "approve" ? "approved" : "rejected",

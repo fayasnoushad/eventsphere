@@ -117,7 +117,7 @@ Visit: http://localhost:3000
 ```javascript
 {
   eventId: string,
-  participantId: string,
+  ticketId: string,
   name: string,
   email: string,
   phone: string,
@@ -133,7 +133,7 @@ Visit: http://localhost:3000
 ```javascript
 {
   eventId: string,
-  participantId: string,
+  ticketId: string,
   checkedInBy: string,
   checkedInAt: Date
 }

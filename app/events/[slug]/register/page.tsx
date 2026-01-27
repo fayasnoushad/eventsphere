@@ -71,7 +71,7 @@ export default function EventRegisterPage() {
 
       if (response.ok) {
         router.push(
-          `/events/${params.slug}/success?id=${data.data.participantId}&name=${formData.name}`,
+          `/events/${params.slug}/success?id=${data.data.ticketId}&name=${formData.name}`,
         );
       } else {
         alert(data.error || "Registration failed");

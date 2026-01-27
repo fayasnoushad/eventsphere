@@ -7,15 +7,15 @@ import { QRCodeSVG } from "qrcode.react";
 function SuccessPageContent() {
   const searchParams = useSearchParams();
   const params = useParams();
-  const participantId = searchParams.get("id");
+  const ticketId = searchParams.get("id");
   const name = searchParams.get("name");
   const slug = params.slug;
 
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    if (participantId) {
-      navigator.clipboard.writeText(participantId);
+    if (ticketId) {
+      navigator.clipboard.writeText(ticketId);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -37,7 +37,7 @@ function SuccessPageContent() {
       const pngFile = canvas.toDataURL("image/png");
 
       const downloadLink = document.createElement("a");
-      downloadLink.download = `ticket-${participantId}.png`;
+      downloadLink.download = `ticket-${ticketId}.png`;
       downloadLink.href = pngFile;
       downloadLink.click();
     };
@@ -45,7 +45,7 @@ function SuccessPageContent() {
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
-  if (!participantId || !name) {
+  if (!ticketId || !name) {
     return (
       <div className="text-center py-20">
         <p className="text-xl">Invalid registration data</p>
@@ -72,7 +72,7 @@ function SuccessPageContent() {
           <div className="bg-white p-6 rounded-lg mb-4">
             <QRCodeSVG
               id="qr-code"
-              value={participantId}
+              value={ticketId}
               size={200}
               level="H"
               includeMargin={true}
@@ -88,7 +88,7 @@ function SuccessPageContent() {
               <input
                 type="text"
                 className="input input-bordered w-full text-center font-mono text-lg"
-                value={participantId}
+                value={ticketId}
                 readOnly
               />
               <button

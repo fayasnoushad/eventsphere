@@ -60,6 +60,21 @@ export default function EventDetailPage() {
             <p className="text-xl mt-2 opacity-70">
               by {event.organizationName}
             </p>
+            <div className="flex items-center gap-2 mt-2 opacity-60 text-sm">
+              <span>Event ID:</span>
+              <code className="bg-base-300 px-2 py-1 rounded font-mono">
+                {event._id?.toString()}
+              </code>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(event._id?.toString() || "");
+                  alert("Event ID copied!");
+                }}
+                className="btn btn-ghost btn-xs"
+              >
+                📋
+              </button>
+            </div>
             <div className="flex gap-2 mt-4">
               <span className={`badge badge-${status.color} badge-lg`}>
                 {status.label}

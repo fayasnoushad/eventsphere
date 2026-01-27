@@ -8,9 +8,9 @@ import { ObjectId } from "mongodb";
 export async function POST(req: NextRequest) {
   try {
     const user = await requireAuth();
-    const { participantId, eventId } = await req.json();
+    const { ticketId, eventId } = await req.json();
 
-    if (!participantId || !eventId) {
+    if (!ticketId || !eventId) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: "Missing required fields" },
         { status: 400 },
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     // Check if participant exists and is approved
     const participants = await db.participants();
-    const participant = await participants.findOne({ eventId, participantId });
+    const participant = await participants.findOne({ eventId, ticketId });
 
     if (!participant) {
       return NextResponse.json<ApiResponse>(
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     // Check if already checked in
     const checkIns = await db.checkIns();
-    const existing = await checkIns.findOne({ eventId, participantId });
+    const existing = await checkIns.findOne({ eventId, ticketId });
 
     if (existing) {
       return NextResponse.json<ApiResponse>(
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const checkIn: CheckIn = {
       eventId,
-      participantId,
+      ticketId,
       checkedInBy: user.userId,
       checkedInAt: now,
     };
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     // Update participant status
     await participants.updateOne(
-      { eventId, participantId },
+      { eventId, ticketId },
       {
         $set: {
           status: "checked-in",
@@ -115,9 +115,9 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const user = await requireAuth();
-    const { participantId, eventId } = await req.json();
+    const { ticketId, eventId } = await req.json();
 
-    if (!participantId || !eventId) {
+    if (!ticketId || !eventId) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: "Missing required fields" },
         { status: 400 },
@@ -144,12 +144,12 @@ export async function DELETE(req: NextRequest) {
 
     // Remove check-in
     const checkIns = await db.checkIns();
-    await checkIns.deleteOne({ eventId, participantId });
+    await checkIns.deleteOne({ eventId, ticketId });
 
     // Update participant status back to approved
     const participants = await db.participants();
     await participants.updateOne(
-      { eventId, participantId },
+      { eventId, ticketId },
       {
         $set: {
           status: "approved",

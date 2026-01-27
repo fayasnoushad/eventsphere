@@ -41,13 +41,13 @@ export default function ScanQRCode() {
     fetchEvent();
   }, [eventId, router]);
 
-  async function addToCheckIn(participantId: string) {
+  async function addToCheckIn(ticketId: string) {
     try {
       const response = await fetch("/api/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          participantId,
+          ticketId,
           eventId,
         }),
       });

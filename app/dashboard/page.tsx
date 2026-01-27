@@ -129,6 +129,24 @@ export default function DashboardPage() {
                         {status.label}
                       </span>
                     </div>
+                    <div className="flex items-center gap-2 opacity-60 text-xs mb-2">
+                      <span>ID:</span>
+                      <code className="bg-base-300 px-1 py-0.5 rounded font-mono">
+                        {event._id?.toString().slice(0, 12)}...
+                      </code>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            event._id?.toString() || "",
+                          );
+                          alert("Event ID copied!");
+                        }}
+                        className="btn btn-ghost btn-xs"
+                        title="Copy full Event ID"
+                      >
+                        📋
+                      </button>
+                    </div>
                     <p className="text-sm opacity-70 line-clamp-2">
                       {event.description}
                     </p>

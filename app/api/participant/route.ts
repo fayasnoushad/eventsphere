@@ -5,7 +5,7 @@ import { ApiResponse } from "@/lib/types";
 // POST /api/participant - Look up participant by ID or phone (public for ticket verification)
 export async function POST(req: NextRequest) {
   try {
-    const { participantId, phone, eventId } = await req.json();
+    const { ticketId, eventId } = await req.json();
 
     if (!eventId) {
       return NextResponse.json<ApiResponse>(
@@ -14,22 +14,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!participantId && !phone) {
-      return NextResponse.json<ApiResponse>(
-        { success: false, error: "Participant ID or phone is required" },
-        { status: 400 },
-      );
-    }
-
     const participants = await db.participants();
-    const query: any = { eventId };
+    const query = { ticketId, eventId };
 
-    if (participantId) {
-      query.participantId = participantId.toUpperCase();
-    } else if (phone) {
-      query.phone = phone.replace(/\D/g, "").slice(-10);
-    }
+    if (!ticketId)
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Participant ID not found" },
+        { status: 404 },
+      );
 
+    console.log("Participant query:", query);
     const participant = await participants.findOne(query);
 
     if (!participant) {
@@ -43,7 +37,7 @@ export async function POST(req: NextRequest) {
     const checkIns = await db.checkIns();
     const checkIn = await checkIns.findOne({
       eventId,
-      participantId: participant.participantId,
+      ticketId: participant.ticketId,
     });
 
     return NextResponse.json<ApiResponse>(

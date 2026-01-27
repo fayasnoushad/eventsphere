@@ -114,12 +114,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Create participant
-    const participantId = generateId(event.slug.substring(0, 3).toUpperCase());
+    const ticketId = generateId(event.slug.substring(0, 3).toUpperCase());
     const now = new Date();
 
     const participant: Participant = {
       eventId,
-      participantId,
+      ticketId,
       name: data.name.toUpperCase().trim(),
       email: data.email.toLowerCase().trim(),
       phone,
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
         success: true,
         message: "Registration successful",
         data: {
-          participantId: participant.participantId,
+          ticketId: participant.ticketId,
           status: participant.status,
           requiresPayment: event.registrationFee > 0,
         },

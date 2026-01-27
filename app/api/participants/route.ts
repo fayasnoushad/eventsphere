@@ -46,11 +46,11 @@ export async function GET(req: NextRequest) {
     // Get check-in status
     const checkIns = await db.checkIns();
     const checkInList = await checkIns.find({ eventId }).toArray();
-    const checkInMap = new Map(checkInList.map((c) => [c.participantId, c]));
+    const checkInMap = new Map(checkInList.map((c) => [c.ticketId, c]));
 
     const enrichedParticipants = participantList.map((p) => ({
       ...p,
-      checkIn: checkInMap.get(p.participantId),
+      checkIn: checkInMap.get(p.ticketId),
     }));
 
     return NextResponse.json<ApiResponse>(
