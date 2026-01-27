@@ -91,6 +91,13 @@ export default function Header() {
                 </Link>
               </>
             )}
+
+            <Link
+              className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
+              href="https://github.com/fayasnoushad/eventsphere"
+            >
+              Source Code
+            </Link>
           </ul>
         </div>
       </div>

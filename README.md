@@ -55,8 +55,8 @@ This project is a clone of [Fest Management Website](https://github.com/fayasnou
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/fayasnoushad/fest-management-website.git
-   cd fest-management-website
+   git clone https://github.com/fayasnoushad/eventsphere.git
+   cd eventsphere
    ```
 
 2. Install dependencies:
@@ -70,7 +70,6 @@ This project is a clone of [Fest Management Website](https://github.com/fayasnou
 
    ```env
    MONGODB_URI=your_mongodb_connection_string
-   PASSWORD=your_admin_password
    JWT_SECRET=your-secret-key
    NODE_ENV=development
    ```
