@@ -152,14 +152,14 @@ export async function DELETE(req: NextRequest) {
       { eventId, participantId },
       {
         $set: {
-          status: 'approved',
+          status: "approved",
           updatedAt: new Date(),
         },
         $unset: {
           checkedInAt: "",
           checkedInBy: "",
         },
-      }
+      },
     );
 
     return NextResponse.json<ApiResponse>(
@@ -167,26 +167,18 @@ export async function DELETE(req: NextRequest) {
         success: true,
         message: "Check-in removed successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     if (error.message === "Unauthorized") {
       return NextResponse.json<ApiResponse>(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
     console.error("Remove check-in error:", error);
     return NextResponse.json<ApiResponse>(
       { success: false, error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-    return Response.json({ success: true });
-  } catch (e: any) {
-    return Response.json(
-      { success: false, error: e.message || "Something wrong" },
       { status: 500 },
     );
   }
