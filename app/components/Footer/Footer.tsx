@@ -8,7 +8,7 @@ export default function Footer() {
           href="https://www.gnu.org/licenses/gpl-3.0.en.html"
           target="_blank"
         >
-          Copyright &copy; {new Date().getFullYear()} - Fest Management Website
+          Copyright &copy; {new Date().getFullYear()} - EventSphere
           <br />
           GNU General Public License v3 (GNU GPL v3)
         </Link>

@@ -1,37 +1,84 @@
-import clientPromise from "@/lib/mongodb";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
+import { ApiResponse } from "@/lib/types";
+import { ObjectId } from "mongodb";
 
+// POST /api/approve - Approve or reject participant
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const password = process.env.PASSWORD;
-  const savedPassword = body.password;
+  try {
+    const user = await requireAuth();
+    const { participantId, eventId, action } = await req.json();
 
-  if (!password || !savedPassword || password !== savedPassword)
-    return Response.json(
-      { success: false, error: "Password not match" },
-      { status: 401 }
+    if (!participantId || !eventId || !action) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
+
+    if (!["approve", "reject"].includes(action)) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Invalid action" },
+        { status: 400 },
+      );
+    }
+
+    // Verify event ownership
+    const events = await db.events();
+    const event = await events.findOne({ _id: new ObjectId(eventId) });
+
+    if (!event) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Event not found" },
+        { status: 404 },
+      );
+    }
+
+    if (event.organizerId !== user.userId) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Unauthorized" },
+        { status: 403 },
+      );
+    }
+
+    // Update participant status
+    const participants = await db.participants();
+    const result = await participants.updateOne(
+      { eventId, participantId },
+      {
+        $set: {
+          status: action === "approve" ? "approved" : "rejected",
+          updatedAt: new Date(),
+        },
+      },
     );
 
-  try {
-    const client = await clientPromise;
-    const db = client.db("texus");
-    await db.collection("participants").deleteMany({ phone: body.phone });
-    const participant = await db
-      .collection("pending")
-      .findOne({ phone: body.phone });
-    if (!participant)
-      return Response.json(
+    if (result.matchedCount === 0) {
+      return NextResponse.json<ApiResponse>(
         { success: false, error: "Participant not found" },
-        { status: 404 }
+        { status: 404 },
       );
-    await db.collection("participants").insertOne(participant);
-    await db.collection("pending").deleteOne({ phone: body.phone });
-    return Response.json({ success: true });
-  } catch (e: any) {
-    console.error(e.message);
-    return Response.json(
-      { success: false, error: e.message || "Something wrong" },
-      { status: 500 }
+    }
+
+    return NextResponse.json<ApiResponse>(
+      {
+        success: true,
+        message: `Participant ${action}d successfully`,
+      },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    if (error.message === "Unauthorized") {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+    console.error("Approve error:", error);
+    return NextResponse.json<ApiResponse>(
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

@@ -1,43 +1,80 @@
-import clientPromise from "@/lib/mongodb";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
+import { ApiResponse } from "@/lib/types";
+import { ObjectId } from "mongodb";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const password = process.env.PASSWORD;
-  const savedPassword = body.password;
-
-  if (!password || !savedPassword || password !== savedPassword)
-    return Response.json(
-      { success: false, error: "Password not match" },
-      { status: 401 }
-    );
-
+// GET /api/participants?eventId=xxx - Get all participants for an event
+export async function GET(req: NextRequest) {
   try {
-    const client = await clientPromise;
-    const db = client.db("texus");
-    const registeredParticipants = await db
-      .collection("participants")
-      .find({})
-      .toArray();
-    const checkinParticipants = await db
-      .collection("checkin")
-      .find({})
-      .toArray();
-    for (let participant of registeredParticipants) {
-      const isCheckedIn = checkinParticipants.some(
-        (checkinParticipant) => checkinParticipant.id === participant.id
+    const user = await requireAuth();
+    const { searchParams } = new URL(req.url);
+    const eventId = searchParams.get("eventId");
+
+    if (!eventId) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Event ID is required" },
+        { status: 400 },
       );
-      participant.checkin = isCheckedIn;
     }
-    return Response.json({
-      success: true,
-      participants: registeredParticipants,
-    });
-  } catch (e: any) {
-    console.error(e.message);
-    return Response.json(
-      { success: false, error: e.message || "Something wrong" },
-      { status: 500 }
+
+    // Verify event ownership
+    const events = await db.events();
+    const event = await events.findOne({ _id: new ObjectId(eventId) });
+
+    if (!event) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Event not found" },
+        { status: 404 },
+      );
+    }
+
+    if (event.organizerId !== user.userId) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Unauthorized" },
+        { status: 403 },
+      );
+    }
+
+    // Get participants
+    const participants = await db.participants();
+    const participantList = await participants
+      .find({ eventId })
+      .sort({ registeredAt: -1 })
+      .toArray();
+
+    // Get check-in status
+    const checkIns = await db.checkIns();
+    const checkInList = await checkIns.find({ eventId }).toArray();
+    const checkInMap = new Map(checkInList.map((c) => [c.participantId, c]));
+
+    const enrichedParticipants = participantList.map((p) => ({
+      ...p,
+      checkIn: checkInMap.get(p.participantId),
+    }));
+
+    return NextResponse.json<ApiResponse>(
+      {
+        success: true,
+        data: {
+          participants: enrichedParticipants,
+          total: participantList.length,
+          checkedIn: checkInList.length,
+        },
+      },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    if (error.message === "Unauthorized") {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+    console.error("Get participants error:", error);
+    return NextResponse.json<ApiResponse>(
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

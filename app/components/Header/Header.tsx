@@ -5,12 +5,26 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function Header() {
-  const [loginStatus, setLoginStatus] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const password = localStorage.getItem("password");
-    if (password && password?.length > 0) setLoginStatus(true);
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/auth/session");
+      setIsAuthenticated(response.ok);
+    } catch {
+      setIsAuthenticated(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    location.href = "/";
+  };
+
   return (
     <header className="navbar min-h-[10vh] bg-base-300 shadow-sm px-5 py-2">
       <Link
@@ -18,9 +32,9 @@ export default function Header() {
         className="text-2xl font-bold flex flex-row gap-2 items-center justify-center"
       >
         <Image src="/favico.ico" alt="Icon" width={50} height={50} />
-        TE-X-US
+        EventSphere
       </Link>
-      <div className="flex flex-row justify-center items-center ml-auto">
+      <div className="flex flex-row justify-center items-center ml-auto gap-2">
         <ThemeDropdown />
         <div className="dropdown dropdown-end">
           <div tabIndex={0} role="button" className="btn btn-ghost m-1">
@@ -43,41 +57,40 @@ export default function Header() {
               className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
               href="/"
             >
-              Events
+              Browse Events
             </Link>
-            <Link
-              className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
-              href="/register"
-            >
-              Register
-            </Link>
-            <Link
-              className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
-              href="/schedule"
-            >
-              Time Schedule
-            </Link>
-            <Link
-              className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
-              href="/certificate"
-            >
-              Certificate
-            </Link>
-            {/* Only admin can login and see participant details */}
-            {loginStatus && (
-              <Link
-                className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
-                href="/admin"
-              >
-                Admin
-              </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
+                  href="/dashboard"
+                >
+                  Dashboard
+                </Link>
+
+                <span
+                  onClick={handleLogout}
+                  className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
+                >
+                  Logout
+                </span>
+              </>
+            ) : (
+              <>
+                <Link
+                  className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
+                  href="/auth/login"
+                >
+                  Organizer Login
+                </Link>
+                <Link
+                  className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
+                  href="/auth/signup"
+                >
+                  Create Account
+                </Link>
+              </>
             )}
-            <Link
-              className="font-semibold p-3 w-full rounded-2xl hover:bg-base-300"
-              href="https://github.com/fayasnoushad/fest-management-website/"
-            >
-              Source Code
-            </Link>
           </ul>
         </div>
       </div>

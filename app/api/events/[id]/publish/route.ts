@@ -4,23 +4,25 @@ import { requireAuth } from "@/lib/auth";
 import { ApiResponse } from "@/lib/types";
 import { ObjectId } from "mongodb";
 
-// GET /api/pending?eventId=xxx - Get pending participants for an event
-export async function GET(req: NextRequest) {
+// POST /api/events/[id]/publish - Publish/unpublish event
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
     const user = await requireAuth();
-    const { searchParams } = new URL(req.url);
-    const eventId = searchParams.get("eventId");
+    const { id } = await params;
+    const { status } = await req.json();
 
-    if (!eventId) {
+    if (!["draft", "published", "cancelled"].includes(status)) {
       return NextResponse.json<ApiResponse>(
-        { success: false, error: "Event ID is required" },
+        { success: false, error: "Invalid status" },
         { status: 400 },
       );
     }
 
-    // Verify event ownership
     const events = await db.events();
-    const event = await events.findOne({ _id: new ObjectId(eventId) });
+    const event = await events.findOne({ _id: new ObjectId(id) });
 
     if (!event) {
       return NextResponse.json<ApiResponse>(
@@ -29,6 +31,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Check ownership
     if (event.organizerId !== user.userId) {
       return NextResponse.json<ApiResponse>(
         { success: false, error: "Unauthorized" },
@@ -36,17 +39,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get pending participants
-    const participants = await db.participants();
-    const pendingList = await participants
-      .find({ eventId, status: "pending" })
-      .sort({ registeredAt: -1 })
-      .toArray();
+    await events.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status, updatedAt: new Date() } },
+    );
 
     return NextResponse.json<ApiResponse>(
       {
         success: true,
-        data: { participants: pendingList },
+        message: `Event ${status} successfully`,
       },
       { status: 200 },
     );
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
         { status: 401 },
       );
     }
-    console.error("Get pending participants error:", error);
+    console.error("Publish event error:", error);
     return NextResponse.json<ApiResponse>(
       { success: false, error: "Internal server error" },
       { status: 500 },

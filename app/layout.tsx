@@ -5,8 +5,9 @@ import Footer from "./components/Footer/Footer";
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
-  title: "TE-X-US",
-  description: "TE-X-US: The future forge",
+  title: "EventSphere - Tech Fests & Hackathons",
+  description:
+    "Your gateway to inter-college technical events, hackathons, and competitions",
   icons: {
     icon: "/favico.ico",
   },

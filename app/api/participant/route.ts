@@ -1,37 +1,66 @@
-import clientPromise from "@/lib/mongodb";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { ApiResponse } from "@/lib/types";
 
+// POST /api/participant - Look up participant by ID or phone (public for ticket verification)
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  let phone = body.phone;
-  let id = body.id;
-  if (id) id = "TF-" + id.toUpperCase();
-
   try {
-    const client = await clientPromise;
-    const db = client.db("texus");
-    const participant = await db
-      .collection("participants")
-      .findOne(phone ? { phone } : { id });
-    if (participant) {
-      const checkedIn = await db
-        .collection("checkin")
-        .findOne({ id: participant.id });
-      if (checkedIn)
-        return Response.json({
-          success: true,
-          participant,
-        });
+    const { participantId, phone, eventId } = await req.json();
+
+    if (!eventId) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Event ID is required" },
+        { status: 400 },
+      );
     }
-    return Response.json({
-      success: false,
-      error: "Not found",
+
+    if (!participantId && !phone) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Participant ID or phone is required" },
+        { status: 400 },
+      );
+    }
+
+    const participants = await db.participants();
+    const query: any = { eventId };
+
+    if (participantId) {
+      query.participantId = participantId.toUpperCase();
+    } else if (phone) {
+      query.phone = phone.replace(/\D/g, "").slice(-10);
+    }
+
+    const participant = await participants.findOne(query);
+
+    if (!participant) {
+      return NextResponse.json<ApiResponse>(
+        { success: false, error: "Participant not found" },
+        { status: 404 },
+      );
+    }
+
+    // Get check-in status
+    const checkIns = await db.checkIns();
+    const checkIn = await checkIns.findOne({
+      eventId,
+      participantId: participant.participantId,
     });
-  } catch (e: any) {
-    console.error(e.message);
-    return Response.json(
-      { success: false, error: e.message || "Something wrong" },
-      { status: 500 }
+
+    return NextResponse.json<ApiResponse>(
+      {
+        success: true,
+        data: {
+          participant,
+          checkIn,
+        },
+      },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    console.error("Participant lookup error:", error);
+    return NextResponse.json<ApiResponse>(
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
