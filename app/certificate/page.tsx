@@ -219,11 +219,6 @@ export default function Certificate() {
                       alt="Logo"
                       className="w-28 absolute top-10 left-12 p-2"
                     />
-                    <img
-                      src="/skc.png"
-                      alt="Logo"
-                      className="w-28 absolute top-10 right-12 p-2"
-                    />
                   </div>
 
                   {/* Certificate Main Text */}

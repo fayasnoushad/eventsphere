@@ -31,7 +31,7 @@ export default function Header() {
         href="/"
         className="text-2xl font-bold flex flex-row gap-2 items-center justify-center"
       >
-        <Image src="/favico.ico" alt="Icon" width={50} height={50} />
+        <Image src="/favico.ico" alt="Icon" className="rounded-[50%]" width={50} height={50} />
         EventSphere
       </Link>
       <div className="flex flex-row justify-center items-center ml-auto gap-2">
