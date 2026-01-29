@@ -17,6 +17,7 @@ export default function CreateEventPage() {
     registrationDeadline: "",
     registrationFee: 0,
     requiresApproval: false,
+    upiId: "",
     contactEmail: "",
     contactPhone: "",
     guidelines: [],
@@ -246,15 +247,46 @@ export default function CreateEventPage() {
                     type="number"
                     className="input w-full"
                     min="0"
-                    value={formData.registrationFee}
-                    onChange={(e) =>
+                    value={
+                      formData.registrationFee === 0
+                        ? ""
+                        : formData.registrationFee
+                    }
+                    onChange={(e) => {
+                      const rawValue = e.target.value;
+                      const normalized = rawValue.replace(/^0+(?=\d)/, "");
                       setFormData({
                         ...formData,
-                        registrationFee: parseInt(e.target.value) || 0,
-                      })
-                    }
+                        registrationFee: normalized
+                          ? parseInt(normalized, 10)
+                          : 0,
+                      });
+                    }}
                   />
                 </fieldset>
+
+                {(formData.type === "tech-fest" ||
+                  formData.type === "hackathon") && (
+                  <fieldset className="fieldset">
+                    <label className="label">UPI ID *</label>
+                    <input
+                      type="text"
+                      className="input w-full"
+                      placeholder="yourupi@bank"
+                      value={formData.upiId}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          upiId: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                    <p className="text-xs opacity-70 mt-1">
+                      Used to generate the payment QR for registrations.
+                    </p>
+                  </fieldset>
+                )}
 
                 <fieldset className="fieldset">
                   <label className="label">Max Participants (optional)</label>

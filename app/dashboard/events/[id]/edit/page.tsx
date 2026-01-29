@@ -21,6 +21,7 @@ export default function EditEventPage() {
     registrationDeadline: "",
     registrationFee: 0,
     requiresApproval: false,
+    upiId: "",
     contactEmail: "",
     contactPhone: "",
     guidelines: [],
@@ -62,6 +63,7 @@ export default function EditEventPage() {
             registrationDeadline: formatDate(event.registrationDeadline),
             registrationFee: event.registrationFee,
             requiresApproval: event.requiresApproval,
+            upiId: event.upiId || "",
             contactEmail: event.contactEmail,
             contactPhone: event.contactPhone,
             guidelines: event.guidelines || [],
@@ -308,14 +310,46 @@ export default function EditEventPage() {
                     type="number"
                     className="input w-full"
                     min="0"
-                    value={formData.registrationFee}
+                    value={
+                      formData.registrationFee === 0
+                        ? ""
+                        : formData.registrationFee
+                    }
+                    onChange={(e) => {
+                      const rawValue = e.target.value;
+                      const normalized = rawValue.replace(/^0+(?=\d)/, "");
+                      setFormData({
+                        ...formData,
+                        registrationFee: normalized
+                          ? parseInt(normalized, 10)
+                          : 0,
+                      });
+                    }}
+                  />
+                </fieldset>
+
+                <fieldset className="fieldset">
+                  <label className="label">UPI ID *</label>
+                  <input
+                    type="text"
+                    className={
+                      "input w-full" +
+                      (formData.registrationFee! > 0 ? "" : " input-disabled")
+                    }
+                    placeholder="yourupi@bank"
+                    value={formData.upiId}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        registrationFee: parseInt(e.target.value) || 0,
+                        upiId: e.target.value,
                       })
                     }
+                    required={formData.registrationFee! > 0}
+                    disabled={formData.registrationFee! <= 0}
                   />
+                  <p className="text-xs opacity-70 mt-1">
+                    Used to generate the payment QR for registrations.
+                  </p>
                 </fieldset>
 
                 <fieldset className="fieldset">
@@ -330,7 +364,7 @@ export default function EditEventPage() {
                       setFormData({
                         ...formData,
                         maxParticipants: e.target.value
-                          ? parseInt(e.target.value)
+                          ? parseInt(e.target.value, 10)
                           : undefined,
                       })
                     }

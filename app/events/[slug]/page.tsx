@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { EventData } from "@/lib/types";
-import { formatDate, formatDateTime, getEventStatus } from "@/lib/utils";
+import {
+  formatDate,
+  formatDateTime,
+  getEventStatus,
+  isEventActive,
+} from "@/lib/utils";
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -45,7 +50,7 @@ export default function EventDetailPage() {
   }
 
   const status = getEventStatus(event);
-  const isOpen = status.label === "Open for Registration";
+  const isOpen = isEventActive(event);
 
   return (
     <main className="min-h-screen p-5">

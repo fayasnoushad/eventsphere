@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { EventData, RegistrationFormData } from "@/lib/types";
+import { QRCodeCanvas } from "qrcode.react";
 
 export default function EventRegisterPage() {
   const params = useParams();
@@ -95,6 +96,12 @@ export default function EventRegisterPage() {
   if (!event) {
     return null;
   }
+
+  const hasUpiPayment =
+    event.registrationFee > 0 && !!event.upiId && event.upiId.trim().length > 0;
+  const upiPaymentUrl = hasUpiPayment
+    ? `upi://pay?pa=${encodeURIComponent(event.upiId!.trim())}&am=${event.registrationFee}&cu=INR`
+    : "";
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen px-5 py-10">
@@ -295,9 +302,51 @@ export default function EventRegisterPage() {
                   Registration Fee: ₹{event.registrationFee}
                   <br />
                   <small>
-                    Payment details will be provided after registration
+                    {hasUpiPayment
+                      ? "Scan the UPI QR below to pay the fee."
+                      : "Payment details will be provided after registration"}
                   </small>
                 </span>
+              </div>
+            )}
+
+            {hasUpiPayment && (
+              <div className="card bg-base-100 border border-base-300">
+                <div className="card-body items-center text-center">
+                  <h3 className="font-semibold">Pay with UPI</h3>
+                  <p className="text-sm opacity-70">
+                    Scan to pay ₹{event.registrationFee}
+                  </p>
+                  <div className="p-3 bg-white rounded-xl shadow">
+                    <QRCodeCanvas
+                      value={upiPaymentUrl}
+                      size={220}
+                      bgColor="#ffffff"
+                      fgColor="#000000"
+                      level="H"
+                      includeMargin
+                      imageSettings={{
+                        src: "/upi-logo.svg",
+                        height: 48,
+                        width: 48,
+                        excavate: true,
+                      }}
+                    />
+                  </div>
+                  <div className="mt-3 text-sm">
+                    <span className="opacity-70">UPI ID:</span> {event.upiId}
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm mt-2"
+                    onClick={() => {
+                      navigator.clipboard.writeText(upiPaymentUrl);
+                      alert("UPI payment link copied!");
+                    }}
+                  >
+                    Copy UPI Link
+                  </button>
+                </div>
               </div>
             )}
 

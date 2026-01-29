@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EventData } from "@/lib/types";
-import { formatDate, getEventStatus } from "@/lib/utils";
+import { formatDate, getEventStatus, isEventActive } from "@/lib/utils";
 
 export default function Home() {
   const [events, setEvents] = useState<EventData[]>([]);
@@ -132,7 +132,7 @@ export default function Home() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl mb-20">
           {filteredEvents.map((event) => {
             const status = getEventStatus(event);
-            const isOpen = status.label === "Open for Registration";
+            const isOpen = isEventActive(event);
 
             return (
               <div

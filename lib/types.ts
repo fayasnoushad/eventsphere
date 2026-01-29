@@ -78,6 +78,7 @@ export interface EventData {
   registrationFee: number;
   maxParticipants?: number;
   requiresApproval: boolean;
+  upiId?: string;
 
   // Sub-events (competitions, workshops, etc.)
   subEvents: EventSubEvent[];
@@ -189,6 +190,7 @@ export interface EventFormData {
   registrationFee: number;
   maxParticipants?: number;
   requiresApproval: boolean;
+  upiId?: string;
   contactEmail: string;
   contactPhone: string;
   guidelines: string[];

@@ -114,6 +114,7 @@ export async function PUT(
       updateFields.maxParticipants = body.maxParticipants;
     if (body.requiresApproval !== undefined)
       updateFields.requiresApproval = body.requiresApproval;
+    if (body.upiId !== undefined) updateFields.upiId = body.upiId.trim();
     if (body.subEvents !== undefined) updateFields.subEvents = body.subEvents;
     if (body.contactEmail !== undefined)
       updateFields.contactEmail = body.contactEmail;

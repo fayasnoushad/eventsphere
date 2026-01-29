@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
       registrationFee: body.registrationFee || 0,
       maxParticipants: body.maxParticipants,
       requiresApproval: body.requiresApproval || false,
+      upiId: body.upiId?.trim() || "",
       subEvents: body.subEvents || [],
       contactEmail: body.contactEmail || user.email,
       contactPhone: body.contactPhone || "",
